@@ -15,7 +15,7 @@ firebaseConfig = {
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
-
+database = firebase.database()
 def signIn(request):
     return render(request,"signIn.html")
 
@@ -29,7 +29,10 @@ def postsign(request):
         return render(request,'signIn.html',{'messg':message})
     print(user['idToken'])
     session_id = user['idToken']
-    request.session['uid']=str(session_id)   
+    request.session['uid']=str(session_id) 
+    uid= user['localId']
+    data = {'email':email,"status":"logged"}
+    database.child("users").child(uid).child("details").set(data) 
     return render(request,'welcome.html',{"e":email})
 
 def loggedout(request):
