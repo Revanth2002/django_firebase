@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
       <meta charset="UTF-8">
-      <title>title</title>
+      <title>check</title>
       <style>
          div{
            position: absolute;
@@ -14,14 +14,19 @@
   <body>
     {% csrf_token %}
     <h1>Welcome {{e}}</h1>
-     <h1>You are successfully logged in</h1>
-     <br><br>
-     <button type="button" onclick="location.href='{% url 'create' %}'">Create Report</button>
-     <button type="button" onclick="location.href='{% url 'check' %}'">Check Report</button>
+     <h1>Your daily reports</h1>
+     
+     <br>
 
+     {% for time,date,work in comb_lis %}
+        Date:{{date}} 
+        Work:<a href = "post_check/?z={{time}}">{{work}}</a>
+    <br>
+     {% endfor %}
 <div>
   <a href="{% url 'log' %}">Logout</a>
- 
+
+  
 </div>
   </body>       
 </html>

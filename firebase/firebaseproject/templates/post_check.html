@@ -2,26 +2,31 @@
 <html lang="en">
   <head>
       <meta charset="UTF-8">
-      <title>title</title>
+      <title>check</title>
       <style>
          div{
            position: absolute;
            right: 10px;
            top: 10px;
          }
+
+        
       </style>
   </head> 
   <body>
     {% csrf_token %}
-    <h1>Welcome {{e}}</h1>
-     <h1>You are successfully logged in</h1>
-     <br><br>
-     <button type="button" onclick="location.href='{% url 'create' %}'">Create Report</button>
-     <button type="button" onclick="location.href='{% url 'check' %}'">Check Report</button>
+     <h2>Your daily reports</h3>
+     <h3>Viewing your daily reports : {{e}}</h2>
+
+     <h4>Date:{{d}}<br></h4>
+     <h4>work:{{w}}<br></h4>
+     <h4>Progress:{{p}}<br></h4>
+     <br>
+
 
 <div>
   <a href="{% url 'log' %}">Logout</a>
- 
+<br><br>
 </div>
   </body>       
 </html>

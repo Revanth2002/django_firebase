@@ -19,7 +19,14 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.signIn),
-    path('postsign/',views.postsign),
-    path('logout/',views.loggedout, name = 'log')
+    path('',views.signIn,name='signin'),
+    path('postsign/',views.postsign,name='welcome'),
+    path('logout/',views.loggedout, name = 'log'),
+    path('signup/',views.signUp,name='signup'),
+    path('postsignup/',views.postsignup,name="postsignup"),
+    path('create/',views.create,name='create'),
+    path('post_create/',views.post_create,name='post_create'),
+    path('check/',views.check,name='check'),
+    path('check/post_check/',views.post_check,name='post_check')
+    
 ]
