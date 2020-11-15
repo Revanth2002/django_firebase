@@ -4,17 +4,18 @@ from django.contrib.auth import logout
 import time
 from datetime import timezone
 import datetime 
-import pytz
+import pytz 
+from django.http import HttpResponse
 
 firebaseConfig = {
-  'apiKey': "APIKEY",
-  'authDomain': "AUTHDOMAIN",
-  'databaseURL': "DATABSEURL",
-  'projectId': "PROJECTURL",
-  'storageBucket': "STORAGEBUCKET",
-  'messagingSenderId': "MESSAGESENDERID",
-  'appId': "APPID",
-  'measurementId': "MEASUREMENTID"
+  'apiKey': "AIzaSyA9lWECICW_Tbj4lahpB0VuzmjlGaLnnXo",
+  'authDomain': "login-demo-148c2.firebaseapp.com",
+  'databaseURL': "https://login-demo-148c2.firebaseio.com",
+  'projectId': "login-demo-148c2",
+  'storageBucket': "login-demo-148c2.appspot.com",
+  'messagingSenderId': "900718925900",
+  'appId': "1:900718925900:web:d74a97a3eacbc3efa77ce9",
+  'measurementId': "G-CE0QD1888L"
 };
 
 firebase = pyrebase.initialize_app(firebaseConfig)
@@ -33,10 +34,10 @@ def postsign(request):
     name = reg[0]
     try:
         user = auth.sign_in_with_email_and_password(email,passw)
-    except:
+    except Exception:
         message = "Invalid Credentials"
         return render(request,'signIn.html',{'messg':message})
-    print(user['idToken'])
+    #print(user['idToken'])
     session_id = user['idToken']
     request.session['uid']=str(session_id) 
 
@@ -55,18 +56,18 @@ def signUp(request):
     return render(request,'signup.html')
 
 def postsignup(request):
-    if request.method=='post':
+        
         name = request.POST.get('name')   
         email = request.POST.get('email')
         passw = request.POST.get('pass')
         try:
             user = auth.create_user_with_email_and_password(email,passw)
-            return redirect('/')
-        except:
-            message = "Unable to create account,Try again"
-            return render(request,'signIn.html',{"messg":message})
-            uid = user['localId']
             
+        except Exception:
+            message = "Unable to create account,Try again"
+            return render(request,'signup.html',{"messg":message})
+            uid = user['localId']
+            print(Exception) 
         data ={"name":name,"status":"1"}
         firebase.child("users").child(uid).child("details").set(data)
         return render(request,"signIn.html")
@@ -77,13 +78,12 @@ def create(request):
 
 
 def post_create(request):
-
-
     tz=pytz.timezone('Asia/Kolkata')
     time_now = datetime.datetime.now(timezone.utc).astimezone(tz)
     millis = int(time.mktime(time_now.timetuple()))
     work = request.POST.get('work')
     progress = request.POST.get('progress')
+    url = request.POST.get('url')
 
     idtoken = request.session['uid']
     a = auth.get_account_info(idtoken)
@@ -91,9 +91,9 @@ def post_create(request):
     a = a[0]
     a = a['localId']
     data = {
-    
         'work':work,
-        "progress":progress  
+        "progress":progress ,
+        "url":url 
     }
     database.child('users').child(a).child('reports').child(millis).set(data)
     name = database.child('users').child(a).child('details').child('name').get().val()
@@ -101,53 +101,106 @@ def post_create(request):
     return render(request,'welcome.html',{"e":name})
 
 def check(request):
-    idtoken = request.session['uid']
-    a = auth.get_account_info(idtoken)
-    a = a['users']
-    a = a[0]
-    a = a['localId']    
+    date_cons="%H:%M %d-%m-%Y"
+    if request.method =='GET' and 'csrfmiddlewaretoken' in request.GET:
+        search = request.GET.get('search')
+        search = search.lower()
+        
+        idtoken = request.session['uid']
+        a = auth.get_account_info(idtoken)
+        a = a['users']
+        a = a[0]
+        uid = a['localId']
+        #print(uid)   
 
-    timestamp= database.child('users').child(a).child('reports').shallow().get().val()
-    lis_time=[]
-    for i in timestamp:
-        lis_time.append(i)
-    lis_time.sort(reverse = True)  
-    #print(lis_time)
-    work=[]
-    for i in lis_time:
-        wor=database.child('users').child(a).child('reports').child(i).child('work').get().val()
-        work.append(wor)  
-    #print(work)
-    date=[]
-    for i in lis_time:
-        i = float(i)
-        dat= datetime.datetime.fromtimestamp(i).strftime("%H:%M %d-%m-%Y")
-        date.append(dat)  
-    #print(date)    
-    name = database.child('users').child(a).child('details').child('name').get().val()
-    comb_lis=[]
+        timestamp= database.child('users').child(uid).child('reports').shallow().get().val()
+        #print(timestamp) 
+        work_id=[]
+        for i in timestamp: 
+            ref = database.child('users').child(uid).child('reports').child(i).child('work').get().val()
+            ref = str(ref)+"$"+str(i)
+            work_id.append(ref)
+        #print(work_id)    
+        matching=[str(string) for string in work_id if search in string.lower() ]
+        
+        s_work = []    
+        s_id=[]
+        for j in matching:
+            work,ids=j.split("$")
+            s_work.append(work)
+            s_id.append(ids)
+
+        date=[]
+        for i in s_id:
+            i = float(i)
+            dat= datetime.datetime.fromtimestamp(i).strftime(date_cons)
+            date.append(dat)  
+        #print(date)    
+        name = database.child('users').child(uid).child('details').child('name').get().val()
+        comb_lis=[]
+        for a,b,c in zip(s_id,date,s_work):
+            d = a,b,c
+            comb_lis.append(d)
+            
+        #print(comb_lis)
+        return render(request,'check.html',{'comb_lis':comb_lis,'e': name,'uid':uid})
+
+        
+    else:
+        idtoken = request.session['uid']
+        a = auth.get_account_info(idtoken)
+        a = a['users']
+        a = a[0]
+        a = a['localId']    
+
+        timestamp= database.child('users').child(a).child('reports').shallow().get().val()
+        lis_time=[]
+        for i in timestamp:
+            lis_time.append(i)
+        lis_time.sort(reverse = True)  
+        #print(lis_time)
+        work=[]
+        for i in lis_time:
+            wor=database.child('users').child(a).child('reports').child(i).child('work').get().val()
+            work.append(wor)  
+        #print(work)
+        date=[]
+        for i in lis_time:
+            i = float(i)
+            dat= datetime.datetime.fromtimestamp(i).strftime(date_cons)
+            date.append(dat)  
+        #print(date)    
+        name = database.child('users').child(a).child('details').child('name').get().val()
+        comb_lis=[]
+        
+        for a,b,c in zip(lis_time,date,work):
+            d = a,b,c
+            comb_lis.append(d)
+            
+        #print(comb_lis)
+        return render(request,'check.html',{'comb_lis':comb_lis,'e': name,'uid':a})
     
-    for a,b,c in zip(lis_time,date,work):
-        d = a,b,c
-        comb_lis.append(d)
-        #print(c)     
-    print(comb_lis)
-    return render(request,'check.html',{'comb_lis':comb_lis,'e': name})
-  
 def post_check(request):
     time = request.GET.get('z')
-
+    
     idtoken = request.session['uid']
     a = auth.get_account_info(idtoken)
     a = a['users']
     a = a[0]
-    a = a['localId']    
+    a = a['localId']  
 
-    work = database.child("user").child(a).child('reports').child(time).child('work').get().val()
-    progress = database.child("user").child(a).child('reports').child(time).child('progress').get().val()
     i=float(time)
     dat= datetime.datetime.fromtimestamp(i).strftime("%H:%M %d-%m-%Y")
+    
+    ref = database.child('users').child(a).child('reports').child(time).child('work').get().val()
+    ref1 = database.child('users').child(a).child('reports').child(time).child('progress').get().val()
+    ref2 = database.child('users').child(a).child('reports').child(time).child('url').get().val()
+    print(time)
+    print(ref)
+    print(ref1)
+    print(ref2)
+    
     name = database.child('users').child(a).child('details').child('name').get().val()
    
-    return render(request,'post_check.html',{'w':work,'p':progress,'d':dat,'e':name})   
+    return render(request,'post_check.html',{'w':ref,'p':ref1,'d':dat,'e':name,'i':ref2})   
     

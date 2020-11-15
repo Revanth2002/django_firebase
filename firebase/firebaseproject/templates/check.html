@@ -20,11 +20,18 @@
 
      {% for time,date,work in comb_lis %}
         Date:{{date}} 
-        Work:<a href = "post_check/?z={{time}}">{{work}}</a>
+        Work:<a href = "/post_check/?z={{time}}">{{work}}</a>
     <br>
      {% endfor %}
+     <form method="get" action="/check" id="s">
+      {% csrf_token %}
+      <input type="text" placeholder="search.." name="search">
+      <input type="hidden" value="{{uid}}">
+      <button type="submit" onclick="location.href='/check/?uid={{uid}}'" form="s">Search</button>
+      <a href="{% url 'log' %}">Logout</a>
+     </form>
 <div>
-  <a href="{% url 'log' %}">Logout</a>
+
 
   
 </div>
