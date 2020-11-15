@@ -30,6 +30,7 @@ urlpatterns = [
     path('post_check/',views.post_check,name='post_check'),
     path('back/',views.back,name='back'),
     path('delete/',views.delete,name='delete'),
+    path('update/',views.update,name='update'),
     
     
     

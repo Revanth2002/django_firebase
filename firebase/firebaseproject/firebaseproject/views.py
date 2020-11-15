@@ -6,7 +6,7 @@ from datetime import timezone
 import datetime 
 import pytz 
 from django.http import HttpResponse
-
+from firebase import firebase
 
 
 firebaseConfig = {
@@ -19,6 +19,7 @@ firebaseConfig = {
   'appId': "1:900718925900:web:d74a97a3eacbc3efa77ce9",
   'measurementId': "G-CE0QD1888L"
 };
+firebase1 = firebase.FirebaseApplication('https://login-demo-148c2.firebaseio.com/users',None)
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
@@ -224,4 +225,24 @@ def delete(request):
     delete = database.child('users').child(a).child('reports').child(timex).remove()
     
     print(timex)
-    return redirect('check') #1605246966
+    return redirect('check') 
+
+def update(request):
+    idtoken = request.session['uid']
+    a = auth.get_account_info(idtoken)
+    a = a['users']
+    a = a[0]
+    a = a['localId']  
+
+    i=float(timex)
+    dat= datetime.datetime.fromtimestamp(i).strftime("%H:%M %d-%m-%Y")
+    
+    firebase1.put('/users/Mb69anRZVeeMfHAUjZKxfxRvunk1/reports/1605247316','work','Succesfull')
+    ref = database.child('users').child(a).child('reports').child(timex).child('work').get().val()
+    ref1 = database.child('users').child(a).child('reports').child(timex).child('progress').get().val()
+    ref2 = database.child('users').child(a).child('reports').child(timex).child('url').get().val()
+    
+    name = database.child('users').child(a).child('details').child('name').get().val()
+
+    return render(request,'update.html',{'w':ref,'p':ref1,'d':dat,'e':name,'i':ref2})   
+   
