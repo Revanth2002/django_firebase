@@ -7,6 +7,8 @@ import datetime
 import pytz 
 from django.http import HttpResponse
 
+
+
 firebaseConfig = {
   'apiKey': "AIzaSyA9lWECICW_Tbj4lahpB0VuzmjlGaLnnXo",
   'authDomain': "login-demo-148c2.firebaseapp.com",
@@ -179,9 +181,13 @@ def check(request):
             
         #print(comb_lis)
         return render(request,'check.html',{'comb_lis':comb_lis,'e': name,'uid':a})
-    
+
+
+timex = 0
 def post_check(request):
-    time = request.GET.get('z')
+    
+    global timex
+    timex = request.GET.get('z')
     
     idtoken = request.session['uid']
     a = auth.get_account_info(idtoken)
@@ -189,18 +195,33 @@ def post_check(request):
     a = a[0]
     a = a['localId']  
 
-    i=float(time)
+    i=float(timex)
     dat= datetime.datetime.fromtimestamp(i).strftime("%H:%M %d-%m-%Y")
     
-    ref = database.child('users').child(a).child('reports').child(time).child('work').get().val()
-    ref1 = database.child('users').child(a).child('reports').child(time).child('progress').get().val()
-    ref2 = database.child('users').child(a).child('reports').child(time).child('url').get().val()
-    print(time)
-    print(ref)
-    print(ref1)
-    print(ref2)
+    ref = database.child('users').child(a).child('reports').child(timex).child('work').get().val()
+    ref1 = database.child('users').child(a).child('reports').child(timex).child('progress').get().val()
+    ref2 = database.child('users').child(a).child('reports').child(timex).child('url').get().val()
+    #print(time)
+    #print(ref)
+    #print(ref1)
+    #print(ref2)
     
     name = database.child('users').child(a).child('details').child('name').get().val()
    
     return render(request,'post_check.html',{'w':ref,'p':ref1,'d':dat,'e':name,'i':ref2})   
     
+def back(request):
+    return redirect('check')
+
+    
+def delete(request):
+    
+    idtoken = request.session['uid']
+    a = auth.get_account_info(idtoken)
+    a = a['users']
+    a = a[0]
+    a = a['localId'] 
+    delete = database.child('users').child(a).child('reports').child(timex).remove()
+    
+    print(timex)
+    return redirect('check') #1605246966

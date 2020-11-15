@@ -27,6 +27,10 @@ urlpatterns = [
     path('create/',views.create,name='create'),
     path('post_create/',views.post_create,name='post_create'),
     path('check/',views.check,name='check'),
-    path('post_check/',views.post_check,name='post_check')
+    path('post_check/',views.post_check,name='post_check'),
+    path('back/',views.back,name='back'),
+    path('delete/',views.delete,name='delete'),
+    
+    
     
 ]
