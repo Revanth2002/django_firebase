@@ -10,14 +10,14 @@ from firebase import firebase
 
 
 firebaseConfig = {
-  'apiKey': "AIzaSyA9lWECICW_Tbj4lahpB0VuzmjlGaLnnXo",
-  'authDomain': "login-demo-148c2.firebaseapp.com",
-  'databaseURL': "https://login-demo-148c2.firebaseio.com",
-  'projectId': "login-demo-148c2",
-  'storageBucket': "login-demo-148c2.appspot.com",
-  'messagingSenderId': "900718925900",
-  'appId': "1:900718925900:web:d74a97a3eacbc3efa77ce9",
-  'measurementId': "G-CE0QD1888L"
+  'apiKey': "--API-KEY--",
+  'authDomain': "--YOUR DOMAIN--",
+  'databaseURL': "--DATABASE-URL--",
+  'projectId': "--PROJECT-ID--",
+  'storageBucket': "--STORAGE-BUCKET--",
+  'messagingSenderId': "--MSG_ID--",
+  'appId': "--APP_ID--",
+  'measurementId': "--MEASUREMENT_ID--"
 };
 firebase1 = firebase.FirebaseApplication('https://login-demo-148c2.firebaseio.com/users',None)
 
